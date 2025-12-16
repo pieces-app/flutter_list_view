@@ -7,6 +7,7 @@ import 'dart:math' as math;
 class FlutterListView extends CustomScrollView {
   final SliverChildDelegate delegate;
   final FlutterListViewController? _controller;
+  final EdgeInsetsGeometry? padding;
 
   const FlutterListView({
     Key? key,
@@ -23,10 +24,10 @@ class FlutterListView extends CustomScrollView {
     double? cacheExtent,
     int? semanticChildCount,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
-    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior =
-        ScrollViewKeyboardDismissBehavior.manual,
+    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
     String? restorationId,
     Clip clipBehavior = Clip.hardEdge,
+    this.padding,
   })  : _controller = controller,
         super(
             key: key,
@@ -54,7 +55,7 @@ class FlutterListView extends CustomScrollView {
     bool? primary,
     ScrollPhysics? physics,
     bool shrinkWrap = false,
-    // EdgeInsetsGeometry? padding,
+    this.padding,
     required IndexedWidgetBuilder itemBuilder,
     int? itemCount,
     bool addAutomaticKeepAlives = true,
@@ -63,8 +64,7 @@ class FlutterListView extends CustomScrollView {
     double? cacheExtent,
     int? semanticChildCount,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
-    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior =
-        ScrollViewKeyboardDismissBehavior.manual,
+    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
     String? restorationId,
     Clip clipBehavior = Clip.hardEdge,
   })  : _controller = controller,
@@ -83,7 +83,6 @@ class FlutterListView extends CustomScrollView {
           primary: primary,
           physics: physics,
           shrinkWrap: shrinkWrap,
-          // padding: padding,
           cacheExtent: cacheExtent,
           semanticChildCount: semanticChildCount ?? itemCount,
           dragStartBehavior: dragStartBehavior,
@@ -100,7 +99,7 @@ class FlutterListView extends CustomScrollView {
     bool? primary,
     ScrollPhysics? physics,
     bool shrinkWrap = false,
-    // EdgeInsetsGeometry? padding,
+    this.padding,
     required IndexedWidgetBuilder itemBuilder,
     required IndexedWidgetBuilder separatorBuilder,
     required int itemCount,
@@ -109,8 +108,7 @@ class FlutterListView extends CustomScrollView {
     bool addSemanticIndexes = true,
     double? cacheExtent,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
-    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior =
-        ScrollViewKeyboardDismissBehavior.manual,
+    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
     String? restorationId,
     Clip clipBehavior = Clip.hardEdge,
   })  : _controller = controller,
@@ -147,7 +145,6 @@ class FlutterListView extends CustomScrollView {
           primary: primary,
           physics: physics,
           shrinkWrap: shrinkWrap,
-          //  padding: padding,
           cacheExtent: cacheExtent,
           semanticChildCount: itemCount,
           dragStartBehavior: dragStartBehavior,
@@ -158,12 +155,21 @@ class FlutterListView extends CustomScrollView {
 
   @override
   List<Widget> buildSlivers(BuildContext context) {
-    return [
-      FlutterSliverList(
-        delegate: delegate,
-        controller: _controller?.sliverController,
-      )
-    ];
+    final sliver = FlutterSliverList(
+      delegate: delegate,
+      controller: _controller?.sliverController,
+    );
+
+    if (padding != null) {
+      return [
+        SliverPadding(
+          padding: padding!,
+          sliver: sliver,
+        ),
+      ];
+    }
+
+    return [sliver];
   }
 
   static int _computeActualChildCount(int itemCount) {
